@@ -1,6 +1,19 @@
 package opensea
 
+import (
+	"fmt"
+)
+
 type Address string
+
+func ParseAddress(addr string) (Address, error) {
+	if addr == "" {
+		return "", fmt.Errorf("empty address")
+	}
+	return Address(addr), nil
+}
+
+const NullAddress Address = ""
 
 type Collection struct {
 	// todo: Support commented fields in Collection struct for /collections GET request
@@ -120,4 +133,20 @@ type errorResponse struct {
 
 func (e errorResponse) Error() string {
 	return "Not success"
+}
+
+func (a Address) String() string {
+	return string(a)
+}
+
+type TimeNano int64
+
+func (t TimeNano) String() string {
+	return fmt.Sprintf("%d", t)
+}
+
+type Number string
+
+func (n Number) String() string {
+	return string(n)
 } 
