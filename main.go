@@ -16,6 +16,7 @@ var (
 	rinkebyAPI          = "https://rinkeby-api.opensea.io"
 	basePath            = "/api/v1"
 	singleAssetEndpoint = basePath + "/asset"
+	singleContractEndpoint = basePath + "/asset_contract"
 )
 
 type Opensea struct {
