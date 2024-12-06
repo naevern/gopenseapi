@@ -149,4 +149,10 @@ type Number string
 
 func (n Number) String() string {
 	return string(n)
+}
+
+type Bytes []byte
+
+func (b Bytes) String() string {
+	return string(b)
 } 
