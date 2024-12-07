@@ -85,3 +85,61 @@ func (a *Address) UnmarshalJSON(b []byte) error {
 func (a Address) MarshalJSON() ([]byte, error) {
 	return []byte(strconv.Quote(a.String())), nil
 }
+
+// Bytes represents a byte slice that can be marshaled/unmarshaled to/from hex strings
+type Bytes []byte
+
+// Bytes32 converts the byte slice to a fixed-size [32]byte array
+func (b Bytes) Bytes32() [32]byte {
+    var result [32]byte
+    // Only copy up to 32 bytes to prevent potential panic on shorter slices
+    copyLen := min(len(b), 32)
+    copy(result[:copyLen], b)
+    return result
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface
+func (b *Bytes) UnmarshalJSON(data []byte) error {
+    // Unquote the JSON string
+    hexStr, err := strconv.Unquote(string(data))
+    if err != nil {
+        return fmt.Errorf("failed to unquote JSON string: %w", err)
+    }
+
+    // Handle empty string case
+    if hexStr == "" {
+        *b = Bytes{}
+        return nil
+    }
+
+    // Validate hex string format
+    if !strings.HasPrefix(hexStr, "0x") {
+        return fmt.Errorf("hex string must start with 0x")
+    }
+
+    // Decode hex string (skip "0x" prefix)
+    decoded, err := hex.DecodeString(hexStr[2:])
+    if err != nil {
+        return fmt.Errorf("failed to decode hex string: %w", err)
+    }
+
+    *b = decoded
+    return nil
+}
+
+// MarshalJSON implements the json.Marshaler interface
+func (b Bytes) MarshalJSON() ([]byte, error) {
+    // Convert to hex string with "0x" prefix
+    hexStr := "0x" + hex.EncodeToString(b)
+    
+    // Quote the string for JSON
+    return []byte(strconv.Quote(hexStr)), nil
+}
+
+// min returns the minimum of two integers
+func min(a, b int) int {
+    if a < b {
+        return a
+    }
+    return b
+}
