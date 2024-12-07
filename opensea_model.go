@@ -143,3 +143,41 @@ func min(a, b int) int {
     }
     return b
 }
+
+type TimeNano time.Time
+
+func (t TimeNano) Time() time.Time {
+    return time.Time(t)
+}
+
+func (t *TimeNano) UnmarshalJSON(b []byte) error {
+    s, err := strconv.Unquote(string(b))
+    if err != nil {
+        return fmt.Errorf("failed to unquote time string: %w", err)
+    }
+
+    // Try parsing with different layout formats
+    layouts := []string{
+        "2006-01-02T15:04:05.999999",
+        "2006-01-02T15:04:05",
+        time.RFC3339,
+        time.RFC3339Nano,
+    }
+
+    var parseErr error
+    for _, layout := range layouts {
+        tt, err := time.Parse(layout, s)
+        if err == nil {
+            *t = TimeNano(tt)
+            return nil
+        }
+        parseErr = err
+    }
+
+    return fmt.Errorf("failed to parse time with any known format: %w", parseErr)
+}
+
+func (t TimeNano) MarshalJSON() ([]byte, error) {
+    s := t.Time().Format(time.RFC3339Nano)
+    return []byte(strconv.Quote(s)), nil
+}
