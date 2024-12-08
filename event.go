@@ -207,7 +207,7 @@ func (o Opensea) RetrievingEventsWithContext(ctx context.Context, params *Retrie
 	}
 
 	events = []*Event{}
-	for true {
+	for {
 		path := "/api/v1/events/?" + params.Encode()
 		b, err := o.GetPath(ctx, path)
 		if err != nil {

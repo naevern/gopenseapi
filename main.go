@@ -103,3 +103,19 @@ func defaultHttpClient() *http.Client {
 	client.Transport = transport
 	return client
 }
+
+func NewOpensea(apiKey string) *Opensea {
+	return &Opensea{
+		API:        mainnetAPI,
+		APIKey:     apiKey,
+		httpClient: defaultHttpClient(),
+	}
+}
+
+func NewTestOpensea(apiKey string) *Opensea {
+	return &Opensea{
+		API:        rinkebyAPI,
+		APIKey:     apiKey,
+		httpClient: defaultHttpClient(),
+	}
+}
