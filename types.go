@@ -17,9 +17,6 @@ const NullAddress Address = ""
 
 type Collection struct {
 	// todo: Support commented fields in Collection struct for /collections GET request
-	//PrimaryAssetContracts
-	//Traits
-	//Stats
 	BannerImageUrl              string      `json:"banner_image_url" bson:"banner_image_url"`
 	ChatUrl                     string      `json:"chat_url" bson:"chat_url"`
 	CreatedDate                 string      `json:"created_date" bson:"created_date"`
@@ -50,10 +47,6 @@ type Collection struct {
 	TwitterUsername             string      `json:"twitter_username" bson:"twitter_username"`
 	InstagramUsername           string      `json:"instagram_username" bson:"instagram_username"`
 	WikiUrl                     string      `json:"wiki_url" bson:"wiki_url"`
-	//IsNSFW                      bool        `json:"is_nsfw" bson:"is_nsfw"`
-	//Fees                        interface{} `json:"fees" bson:"fees"`
-	//IsRarityEnabled             bool        `json:"is_rarity_enabled" bson:"is_rarity_enabled"`
-	//IsCreatorFeesEnforced       bool        `json:"is_creator_fees_enforced" bson:"is_creator_fees_enforced"`
 }
 
 type User struct {
@@ -113,18 +106,8 @@ type Asset struct {
 	Collection           *Collection    `json:"collection" bson:"collection"`
 	Decimals             int64          `json:"decimals" bson:"decimals"`
 	TokenMetadata        string         `json:"token_metadata" bson:"token_metadata"`
-	//IsNSFW               bool           `json:"is_nsfw" bson:"is_nsfw"`
 	Owner *Account `json:"owner" bson:"owner"`
-	//SeaportSellOrders       string         `json:"seaport_sell_orders" bson:"seaport_sell_orders"`
-	//Creator                 *Creator       `json:"creator" bson:"creator"`
 	Traits interface{} `json:"traits" bson:"traits"`
-	//LastSale                string         `json:"last_sale" bson:"last_sale"`
-	//TopBid                  int64          `json:"top_bid" bson:"top_bid"`
-	//ListingDate             string         `json:"listing_date" bson:"listing_date"`
-	//SupportsWyvern          string         `json:"supports_wyvern" bson:"supports_wyvern"`
-	//RarityData              *RarityData    `json:"rarity_data" bson:"rarity_data"`
-	//TransferFee             int64          `json:"transfer_fee" bson:"transfer_fee"`
-	//TransferFeePaymentToken string         `json:"transfer_fee_payment_token" bson:"transfer_fee_payment_token"`
 }
 
 type errorResponse struct {
