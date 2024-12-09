@@ -1,26 +1,19 @@
 package opensea
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"math/big"
 	"net"
 	"net/http"
 	"time"
 )
 
 const (
-	mainnetAPI  = "https://api.opensea.io"
 	testnetAPI  = "https://testnets-api.opensea.io"
-	rinkebyAPI  = "https://rinkeby-api.opensea.io"
-	basePath    = "/api/v1"
-	contractEP  = basePath + "/asset_contract"
-	assetEP     = basePath + "/asset"
+	// rinkebyAPI is already declared
+	contractEP  = "/api/v1/asset_contract"
+	assetEP     = "/api/v1/asset"
 )
 
-type Opensea struct {
+type OpenseaClient struct {
 	API        string
 	APIKey     string
 	httpClient *http.Client
@@ -34,9 +27,8 @@ func (e errorResponse) Error() string {
 	return "Operation unsuccessful"
 }
 
-// NewOpensea initializes an Opensea instance for the mainnet.
-func NewOpensea(apiKey string) *Opensea {
-	return &Opensea{
+func NewOpenseaMainnet(apiKey string) *OpenseaClient {
+	return &OpenseaClient{
 		API:        mainnetAPI,
 		APIKey:     apiKey,
 		httpClient: newHttpClient(),
@@ -44,8 +36,8 @@ func NewOpensea(apiKey string) *Opensea {
 }
 
 // NewOpenseaRinkeby initializes an Opensea instance for the Rinkeby testnet.
-func NewOpenseaRinkeby(apiKey string) *Opensea {
-	return &Opensea{
+func NewOpenseaRinkeby(apiKey string) *OpenseaClient {
+	return &OpenseaClient{
 		API:        rinkebyAPI,
 		APIKey:     apiKey,
 		httpClient: newHttpClient(),

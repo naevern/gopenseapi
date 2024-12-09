@@ -110,13 +110,6 @@ type Asset struct {
 	Traits interface{} `json:"traits" bson:"traits"`
 }
 
-type errorResponse struct {
-	Success bool `json:"success" bson:"success"`
-}
-
-func (e errorResponse) Error() string {
-	return "Not success"
-}
 
 func (a Address) String() string {
 	return string(a)
