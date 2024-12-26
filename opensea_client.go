@@ -1,17 +1,26 @@
 package opensea
 
 import (
+	"context"
+	"io"
 	"net"
 	"net/http"
 	"time"
 )
 
 const (
-	testnetAPI  = "https://testnets-api.opensea.io"
+	testnetAPI = "https://testnets-api.opensea.io"
 	// rinkebyAPI is already declared
-	contractEP  = "/api/v1/asset_contract"
-	assetEP     = "/api/v1/asset"
+	contractEP = "/api/v1/asset_contract"
+	assetEP    = "/api/v1/asset"
 )
+
+// Client represents an OpenSea API client
+type Client struct {
+	baseURL    string
+	apiKey     string
+	httpClient *http.Client
+}
 
 type OpenseaClient struct {
 	API        string
@@ -60,3 +69,21 @@ func newHttpClient() *http.Client {
 	}
 }
 
+func (c *Client) get(ctx context.Context, path string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", c.baseURL+path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if c.apiKey != "" {
+		req.Header.Set("X-API-KEY", c.apiKey)
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return io.ReadAll(resp.Body)
+}

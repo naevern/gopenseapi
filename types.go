@@ -61,7 +61,7 @@ type Account struct {
 	DiscordID     string  `json:"discord_id" bson:"discord_id"`
 }
 
-type AssetContract struct {
+type NFTContract struct {
 	Address                     Address     `json:"address" bson:"address"`
 	AssetContractType           string      `json:"asset_contract_type" bson:"asset_contract_type"`
 	CreatedDate                 string      `json:"created_date" bson:"created_date"`
@@ -88,28 +88,27 @@ type AssetContract struct {
 
 type Asset struct {
 	// todo: Support commented fields in Asset struct
-	ID                   int64          `json:"id" bson:"id"`
-	TokenID              string         `json:"token_id" bson:"token_id"`
-	NumSales             int64          `json:"num_sales" bson:"num_sales"`
-	BackgroundColor      string         `json:"background_color" bson:"background_color"`
-	ImageURL             string         `json:"image_url" bson:"image_url"`
-	ImagePreviewURL      string         `json:"image_preview_url" bson:"image_preview_url"`
-	ImageThumbnailURL    string         `json:"image_thumbnail_url" bson:"image_thumbnail_url"`
-	ImageOriginalURL     string         `json:"image_original_url" bson:"image_original_url"`
-	AnimationURL         string         `json:"animation_url" bson:"animation_url"`
-	AnimationOriginalURL string         `json:"animation_original_url" bson:"animation_original_url"`
-	Name                 string         `json:"name" bson:"name"`
-	Description          string         `json:"description" bson:"description"`
-	ExternalLink         string         `json:"external_link" bson:"external_link"`
-	AssetContract        *AssetContract `json:"asset_contract" bson:"asset_contract"`
-	Permalink            string         `json:"permalink" bson:"permalink"`
-	Collection           *Collection    `json:"collection" bson:"collection"`
-	Decimals             int64          `json:"decimals" bson:"decimals"`
-	TokenMetadata        string         `json:"token_metadata" bson:"token_metadata"`
-	Owner *Account `json:"owner" bson:"owner"`
-	Traits interface{} `json:"traits" bson:"traits"`
+	ID                   int64        `json:"id" bson:"id"`
+	TokenID              string       `json:"token_id" bson:"token_id"`
+	NumSales             int64        `json:"num_sales" bson:"num_sales"`
+	BackgroundColor      string       `json:"background_color" bson:"background_color"`
+	ImageURL             string       `json:"image_url" bson:"image_url"`
+	ImagePreviewURL      string       `json:"image_preview_url" bson:"image_preview_url"`
+	ImageThumbnailURL    string       `json:"image_thumbnail_url" bson:"image_thumbnail_url"`
+	ImageOriginalURL     string       `json:"image_original_url" bson:"image_original_url"`
+	AnimationURL         string       `json:"animation_url" bson:"animation_url"`
+	AnimationOriginalURL string       `json:"animation_original_url" bson:"animation_original_url"`
+	Name                 string       `json:"name" bson:"name"`
+	Description          string       `json:"description" bson:"description"`
+	ExternalLink         string       `json:"external_link" bson:"external_link"`
+	AssetContract        *NFTContract `json:"asset_contract" bson:"asset_contract"`
+	Permalink            string       `json:"permalink" bson:"permalink"`
+	Collection           *Collection  `json:"collection" bson:"collection"`
+	Decimals             int64        `json:"decimals" bson:"decimals"`
+	TokenMetadata        string       `json:"token_metadata" bson:"token_metadata"`
+	Owner                *Account     `json:"owner" bson:"owner"`
+	Traits               interface{}  `json:"traits" bson:"traits"`
 }
-
 
 func (a Address) String() string {
 	return string(a)
@@ -131,4 +130,4 @@ type Bytes []byte
 
 func (b Bytes) String() string {
 	return string(b)
-} 
+}
