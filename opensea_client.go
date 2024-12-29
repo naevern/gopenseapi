@@ -8,13 +8,6 @@ import (
 	"time"
 )
 
-const (
-	testnetAPI = "https://testnets-api.opensea.io"
-	// rinkebyAPI is already declared
-	contractEP = "/api/v1/asset_contract"
-	assetEP    = "/api/v1/asset"
-)
-
 // Client represents an OpenSea API client
 type Client struct {
 	baseURL    string
