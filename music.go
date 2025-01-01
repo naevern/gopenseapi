@@ -6,19 +6,15 @@ import (
 	"fmt"
 )
 
-// MusicFilter represents parameters for filtering music NFTs
-type MusicFilter struct {
-	Collection string   `json:"collection,omitempty"`
-	TokenIDs   []string `json:"token_ids,omitempty"`
-	Owner      string   `json:"owner,omitempty"`
-	Limit      int      `json:"limit,omitempty"`
-	Offset     int      `json:"offset,omitempty"`
-}
+const (
+	defaultLimit     = 20
+	defaultTimeFrame = "24h"
+)
 
-// MusicResponse represents the API response for music NFTs
-type MusicResponse struct {
-	Assets []Asset `json:"assets"`
-	Next   string  `json:"next"`
+// MusicFilter extends NFTFilter to include music-specific filters
+type MusicFilter struct {
+	NFTFilter
+	AnimationURLExists bool `json:"animation_url_exists,omitempty"`
 }
 
 // TrendingMusicFilter represents parameters for filtering trending music NFTs
@@ -37,13 +33,21 @@ type TrendingMusicResponse struct {
 }
 
 // GetMusic retrieves music NFTs based on the provided filters
-func (c *Client) GetMusic(ctx context.Context, filter MusicFilter) (*MusicResponse, error) {
+func (c *Client) GetMusic(ctx context.Context, filter MusicFilter) (*NFTResponse, error) {
 	if filter.Limit == 0 {
-		filter.Limit = 20 // Default limit
+		filter.Limit = defaultLimit
 	}
 
-	// Construct query parameters
-	query := fmt.Sprintf("%s?limit=%d", musicEP, filter.Limit)
+	// Always set animation_url_exists for music NFTs
+	filter.AnimationURLExists = true
+
+	query := buildMusicQuery(musicEP, filter)
+	return c.fetchNFTs(ctx, query)
+}
+
+// buildMusicQuery constructs the query string for music NFT requests
+func buildMusicQuery(endpoint string, filter MusicFilter) string {
+	query := fmt.Sprintf("%s?limit=%d&animation_url_exists=true", endpoint, filter.Limit)
 
 	if filter.Collection != "" {
 		query += fmt.Sprintf("&collection=%s", filter.Collection)
@@ -60,53 +64,20 @@ func (c *Client) GetMusic(ctx context.Context, filter MusicFilter) (*MusicRespon
 		}
 	}
 
-	// Add filter for assets with animation_url (music NFTs typically have this)
-	query += "&animation_url_exists=true"
-
-	resp, err := c.get(ctx, query)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get music NFTs: %w", err)
-	}
-
-	var musicResp MusicResponse
-	if err := json.Unmarshal(resp, &musicResp); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal music response: %w", err)
-	}
-
-	return &musicResp, nil
+	return query
 }
 
-// GetMusicByCollection is a convenience method to get music NFTs from a specific collection
-func (c *Client) GetMusicByCollection(ctx context.Context, collectionSlug string) (*MusicResponse, error) {
-	return c.GetMusic(ctx, MusicFilter{
-		Collection: collectionSlug,
-		Limit:      50,
-	})
-}
-
-// GetMusicByOwner is a convenience method to get music NFTs owned by a specific address
-func (c *Client) GetMusicByOwner(ctx context.Context, ownerAddress string) (*MusicResponse, error) {
-	return c.GetMusic(ctx, MusicFilter{
-		Owner: ownerAddress,
-		Limit: 50,
-	})
-}
-
-// GetTrendingMusic retrieves trending music NFTs based on volume and sales
+// GetTrendingMusic retrieves trending music NFTs
 func (c *Client) GetTrendingMusic(ctx context.Context, filter TrendingMusicFilter) (*TrendingMusicResponse, error) {
 	if filter.Limit == 0 {
-		filter.Limit = 20 // Default limit
+		filter.Limit = defaultLimit
 	}
 	if filter.TimeWindow == "" {
-		filter.TimeWindow = "24h" // Default time window
+		filter.TimeWindow = defaultTimeFrame
 	}
 
-	// Construct query parameters
-	query := fmt.Sprintf("%s/trending?limit=%d&time_window=%s", musicEP, filter.Limit, filter.TimeWindow)
-
-	// Add music-specific filters
-	query += "&animation_url_exists=true"
-	query += "&order_by=sale_count" // Order by number of sales
+	query := fmt.Sprintf("%s/trending?limit=%d&time_window=%s&animation_url_exists=true&order_by=sale_count",
+		musicEP, filter.Limit, filter.TimeWindow)
 
 	resp, err := c.get(ctx, query)
 	if err != nil {
@@ -121,26 +92,34 @@ func (c *Client) GetTrendingMusic(ctx context.Context, filter TrendingMusicFilte
 	return &trendingResp, nil
 }
 
-// GetTrendingMusicLast24Hours is a convenience method to get trending music NFTs in the last 24 hours
+// Convenience methods for common music NFT queries
+func (c *Client) GetMusicByCollection(ctx context.Context, collectionSlug string) (*NFTResponse, error) {
+	return c.GetMusic(ctx, MusicFilter{
+		NFTFilter: NFTFilter{
+			Collection: collectionSlug,
+			Limit:      50,
+		},
+	})
+}
+
+func (c *Client) GetMusicByOwner(ctx context.Context, ownerAddress string) (*NFTResponse, error) {
+	return c.GetMusic(ctx, MusicFilter{
+		NFTFilter: NFTFilter{
+			Owner: ownerAddress,
+			Limit: 50,
+		},
+	})
+}
+
+// Convenience methods for trending music with different time windows
 func (c *Client) GetTrendingMusicLast24Hours(ctx context.Context) (*TrendingMusicResponse, error) {
-	return c.GetTrendingMusic(ctx, TrendingMusicFilter{
-		TimeWindow: "24h",
-		Limit:      20,
-	})
+	return c.GetTrendingMusic(ctx, TrendingMusicFilter{TimeWindow: "24h"})
 }
 
-// GetTrendingMusicLastWeek is a convenience method to get trending music NFTs in the last week
 func (c *Client) GetTrendingMusicLastWeek(ctx context.Context) (*TrendingMusicResponse, error) {
-	return c.GetTrendingMusic(ctx, TrendingMusicFilter{
-		TimeWindow: "7d",
-		Limit:      20,
-	})
+	return c.GetTrendingMusic(ctx, TrendingMusicFilter{TimeWindow: "7d"})
 }
 
-// GetTrendingMusicLastMonth is a convenience method to get trending music NFTs in the last month
 func (c *Client) GetTrendingMusicLastMonth(ctx context.Context) (*TrendingMusicResponse, error) {
-	return c.GetTrendingMusic(ctx, TrendingMusicFilter{
-		TimeWindow: "30d",
-		Limit:      20,
-	})
+	return c.GetTrendingMusic(ctx, TrendingMusicFilter{TimeWindow: "30d"})
 }
